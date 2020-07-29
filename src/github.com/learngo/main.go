@@ -67,6 +67,7 @@ func writeJobs(jobs []extractedJob) {
 // page ( 0 ~ lastLnegth )
 func getPage(page int) []extractedJob {
 	var jobs []extractedJob
+	c := make(chan extractedJob)
 	pageURL := baseURL + "&start=" + strconv.Itoa(page*50)
 	fmt.Println("Requesting...", pageURL)
 	res, err := http.Get(pageURL)
@@ -84,22 +85,27 @@ func getPage(page int) []extractedJob {
 	// job 정보를 추출한다.
 	searchCards.Each(func(i int, card *goquery.Selection) {
 		// extractedJob struct
-		job := extractJob(card)
-		// []extractedJob struct에 개별 extractedJob struct를 주입
-		jobs = append(jobs, job)
+		go extractJob(card, c)
 	})
+
+	for i := 0; i < searchCards.Length(); i++ {
+		job := <-c
+		// 이번엔 채널을 jobs에 담는다.
+		jobs = append(jobs, job)
+	}
 
 	return jobs
 }
 
-func extractJob(card *goquery.Selection) extractedJob {
+func extractJob(card *goquery.Selection, c chan<- extractedJob) extractedJob {
 	id, _ := card.Attr("data-jk")
 	title := cleanString(card.Find(".title>a").Text())
 	location := cleanString(card.Find(".sjcl").Text())
 	salary := cleanString(card.Find("salaryText").Text())
 	summary := cleanString(card.Find(".summary").Text())
-	// struct 에 주입하여 리턴한다.
-	return extractedJob{
+
+	// card의 개수마다 요게 반복해서 채널에 콕콕!
+	c <- extractedJob{
 		id:       id,
 		title:    title,
 		location: location,
