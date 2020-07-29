@@ -22,18 +22,26 @@ type extractedJob struct {
 var baseURL string = "https://kr.indeed.com/jobs?q=python&limit=50"
 
 func main() {
+	// main에 있는 jobs은 []extractedJob이 모여있는 []extractedJob이다.
+	// 그러므로 아래서 spread문법으로 풀어준다.
+	var jobs []extractedJob
 	totalPages := getPages()
 
 	// 각각의 페이지를 탐색한다. (페이지네이션에서 페이지를 얻은만큼 !)
 	for i := 0; i < totalPages; i++ {
-		getPage(i)
+		extractedJobs := getPage(i)
+		// 배열 안에 배열이 들어가있으면 안되므로 풀어서 넣는다.
+		jobs = append(jobs, extractedJobs...)
 	}
+
+	fmt.Println(jobs)
 }
 
-func getPage(i int) {
-	baseURL := baseURL + "&start=" + strconv.Itoa(i*50)
-	fmt.Println("Requesting...", baseURL)
-	res, err := http.Get(baseURL)
+func getPage(i int) []extractedJob {
+	var jobs []extractedJob
+	pageURL := baseURL + "&start=" + strconv.Itoa(i*50)
+	fmt.Println("Requesting...", pageURL)
+	res, err := http.Get(pageURL)
 	checkErr(err)
 	checkCode(res)
 
@@ -47,9 +55,13 @@ func getPage(i int) {
 
 	// job 정보를 추출한다.
 	searchCards.Each(func(i int, card *goquery.Selection) {
-		extractJob(card)
+		// extractedJob struct
+		job := extractJob(card)
+		// []extractedJob struct에 개별 extractedJob struct를 주입
+		jobs = append(jobs, job)
 	})
 
+	return jobs
 }
 
 func extractJob(card *goquery.Selection) extractedJob {
