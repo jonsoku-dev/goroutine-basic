@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
-// 둘다 인트면 나중에 적어도 인식한다.
-func multiply(a, b int) int {
-	return a * b
+// return multiple value function
+func lenAndUpper(name string) (int, string) {
+	return len(name), strings.ToUpper(name)
 }
 
 func main() {
-	fmt.Println(multiply(2, 2))
+	totalLength, upperName := lenAndUpper("jongseok")
+	fmt.Println(totalLength, upperName)
 }
