@@ -4,9 +4,10 @@ import (
 	"fmt"
 )
 
+func multiply(a int, b int) int {
+	return a * b
+}
+
 func main() {
-	// type 추론
-	name := "jongseok"
-	name = "kazuko"
-	fmt.Println(name)
+	fmt.Println(multiply(2, 2))
 }
