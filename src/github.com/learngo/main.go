@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -12,7 +13,16 @@ var baseURL string = "https://kr.indeed.com/jobs?q=python&limit=50"
 
 func main() {
 	totalPages := getPages()
-	fmt.Println(totalPages)
+
+	// 각각의 페이지를 탐색한다. (페이지네이션에서 페이지를 얻은만큼 !)
+	for i := 0; i < totalPages; i++ {
+		getPage(i)
+	}
+}
+
+func getPage(i int) {
+	baseURL := baseURL + "&start=" + strconv.Itoa(i*50)
+	fmt.Println("Requesting...", baseURL)
 }
 
 func getPages() int {
