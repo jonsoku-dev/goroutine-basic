@@ -4,7 +4,8 @@ import (
 	"fmt"
 )
 
-func multiply(a int, b int) int {
+// 둘다 인트면 나중에 적어도 인식한다.
+func multiply(a, b int) int {
 	return a * b
 }
 
