@@ -89,8 +89,9 @@ func getPage(page int) []extractedJob {
 	})
 
 	for i := 0; i < searchCards.Length(); i++ {
+		// card의 개수마다 요게 반복해서 채널에 콕콕찔렸으니 그 채널을 job에 담고
 		job := <-c
-		// 이번엔 채널을 jobs에 담는다.
+		// job에 담긴 채널을 jobs에 담는다. 즉, jobs는 채널들의 배열이라해야되나?
 		jobs = append(jobs, job)
 	}
 
