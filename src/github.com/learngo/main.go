@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 var baseURL string = "https://kr.indeed.com/jobs?q=python&limit=50"
@@ -15,6 +17,13 @@ func getPages() int {
 	res, err := http.Get(baseURL)
 	checkErr(err)
 	checkCode(res.StatusCode)
+
+	defer res.Body.Close()
+
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	checkErr(err)
+
+	doc.Find(".pagination").Each()
 
 	return 0
 }
