@@ -37,6 +37,7 @@ func main() {
 	}
 
 	writeJobs(jobs)
+	fmt.Println("파일 작성 완료 🔥 ", len(jobs))
 }
 
 func writeJobs(jobs []extractedJob) {
@@ -50,11 +51,23 @@ func writeJobs(jobs []extractedJob) {
 	headers := []string{"ID", "Title", "Location", "Salary", "Summary"}
 	wErr := w.Write(headers)
 	checkErr(wErr)
+
+	/*
+		전체 jobs를 순회하면서 map을 하나 만든다.
+		map안에는 id, title, location, salary, summary 순으로 작성을 하고
+		해당하는 jobSlice를  csv파일에 한줄씩 저장한다 (나중에 이곳도 채널링해야할듯)
+	*/
+	for _, job := range jobs {
+		jobSlice := []string{job.id, job.title, job.location, job.salary, job.summary}
+		jwErr := w.Write(jobSlice)
+		checkErr(jwErr)
+	}
 }
 
-func getPage(i int) []extractedJob {
+// page ( 0 ~ lastLnegth )
+func getPage(page int) []extractedJob {
 	var jobs []extractedJob
-	pageURL := baseURL + "&start=" + strconv.Itoa(i*50)
+	pageURL := baseURL + "&start=" + strconv.Itoa(page*50)
 	fmt.Println("Requesting...", pageURL)
 	res, err := http.Get(pageURL)
 	checkErr(err)
